@@ -24,9 +24,6 @@ import static org.travelsystem.common.TouchType.OFF;
 import static org.travelsystem.common.TouchType.ON;
 
 
-// read data for a day
-// process
-
 public class TravelSystem {
     public static final String INCOMPLETE = "INCOMPLETE";
     public static final String COMPLETED = "COMPLETED";
@@ -66,6 +63,7 @@ public class TravelSystem {
     private static final String STOP_B = "StopB";
     private static final String STOP_C = "StopC";
     private final List<String[]> trips;
+    private final List<String[]> unprocessableTouches;
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy HH:mm:ss");
 
@@ -76,6 +74,7 @@ public class TravelSystem {
         this.summaryFilePath = summaryFilePath;
         this.busTouches = new HashMap<>();
         this.trips = new LinkedList<>();
+        this.unprocessableTouches = new LinkedList<>();
     }
 
     public void process(String filepath) {
@@ -128,6 +127,7 @@ public class TravelSystem {
             }
             processTouches();
             tripsWriter.writeAll(trips);
+            unprocessableTouchDataWriter.writeAll(unprocessableTouches);
 
 
             tripsWriter.close();
@@ -149,15 +149,14 @@ public class TravelSystem {
             for (Touch touch : touches) {
                 if (touch.getTouchType() == ON) {
                     if (onTouchMap.containsKey(touch.getPan())) {
-                        throw new RuntimeException("duplication touch");
+                        unprocessableTouches.add(setupUnprocessableTouch(touch, "On type touch duplication"));
                     } else {
                         onTouchMap.put(touch.getPan(), touch);
                     }
                 }
                 if (touch.getTouchType() == OFF) {
                     if (!onTouchMap.containsKey(touch.getPan())) {
-                        System.out.println(onTouchMap);
-                        throw new RuntimeException("invalid touch" + touch.getPan());
+                        unprocessableTouches.add(setupUnprocessableTouch(touch, "Off type touch without On type"));
                     } else {
                         Touch onTouch = onTouchMap.remove(touch.getPan());
                         trips.add(setupTrip(onTouch, touch));
@@ -172,9 +171,21 @@ public class TravelSystem {
         }
     }
 
+    private String[] setupUnprocessableTouch(Touch touch, String reason) {
+        return new String[]{
+                dateTimeFormatter.print(touch.getDatetime()),
+                getTouchTypeString(touch.getTouchType()),
+                touch.getStopId(),
+                touch.getCompanyId(),
+                touch.getBusId(),
+                touch.getPan(),
+                reason
+        };
+    }
+
     private String[] setupTrip(Touch onTouch, Touch offTouch) {
         String status = getTripStatus(onTouch, offTouch);
-        Touch lastTouch = status.equals(CANCELLED) ? onTouch : offTouch;
+        Touch lastTouch = COMPLETED.equals(status) ? offTouch : onTouch;
         return new String[]{
                 dateTimeFormatter.print(onTouch.getDatetime()),
                 dateTimeFormatter.print(lastTouch.getDatetime()),
@@ -201,7 +212,7 @@ public class TravelSystem {
 
     private double calculatedFee(Touch onTouch, Touch offTouch) {
         if (offTouch == null) {
-            switch (onTouch.getBusId()) {
+            switch (onTouch.getStopId()) {
                 case STOP_A:
                     return AC_COST;
                 case STOP_B:
@@ -235,6 +246,10 @@ public class TravelSystem {
 
     private TouchType getTouchType(String type) {
         return type.equals("ON") ? ON : OFF;
+    }
+
+    private String getTouchTypeString(TouchType type) {
+        return type == ON ? "ON" : "OFF";
     }
 
     private Map<String, List<Touch>> busTouches;
