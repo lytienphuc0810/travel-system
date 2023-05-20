@@ -67,7 +67,7 @@ public class TravelSystem {
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy HH:mm:ss");
     private final DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("dd-MM-yyyy");
-    private Map<String, List<Touch>> busTouches;
+    private final Map<String, List<Touch>> busTouches;
 
     public TravelSystem(String tripsFilePath, String unprocessableTouchDataFilePath, String summaryFilePath) {
         this.tripsFilePath = tripsFilePath;
@@ -130,7 +130,7 @@ public class TravelSystem {
             processTouches();
             tripsWriter.writeAll(trips.stream().map(s -> s.toStringArray(dateTimeFormatter)).collect(Collectors.toList()));
             unprocessableTouchDataWriter.writeAll(unprocessableTouches);
-            summaryWriter.writeAll(summaries.stream().map(s -> s.toStringArray(dateTimeFormatter)).collect(Collectors.toList()));
+            summaryWriter.writeAll(summaries.stream().map(s -> s.toStringArray(dateFormatter)).collect(Collectors.toList()));
 
 
             tripsWriter.close();
@@ -178,7 +178,8 @@ public class TravelSystem {
         for (Trip trip : trips) {
             Summary summary = summaryMap.computeIfAbsent(
                     dateFormatter.print(trip.getStarted()) + trip.getCompanyId() + trip.getBusId(),
-                    k -> new Summary(trip.getStarted(), trip.getCompanyId(), trip.getBusId()));
+                    k -> new Summary(trip.getStarted().withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0),
+                            trip.getCompanyId(), trip.getBusId()));
             switch (trip.getStatus()) {
                 case COMPLETED:
                     summary.setCompleteTripCount(summary.getCompleteTripCount() + 1);
@@ -194,6 +195,7 @@ public class TravelSystem {
             }
             summary.setTotalCharges(summary.getTotalCharges() + trip.getChargeAmount());
         }
+        summaries.addAll(summaryMap.values());
     }
 
     private String[] setupUnprocessableTouch(Touch touch, String reason) {
