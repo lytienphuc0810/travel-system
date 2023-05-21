@@ -4,6 +4,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
@@ -49,7 +50,6 @@ public class TravelSystem {
             "IncompleteTripCount",
             "CancelledTripCount",
             "TotalCharges",
-
     };
     private static final double AB_COST = 4.5;
     private static final double BC_COST = 6.25;
@@ -120,8 +120,8 @@ public class TravelSystem {
                             DigestUtils.sha256Hex(nextRecord[6])
                     );
                 } catch (Exception e) {
-                    // catch here
-                    System.out.println(e.getMessage());
+                    unprocessableTouches.add(setupUnprocessableTouch(nextRecord, String.format("%s %s", e.getClass().getSimpleName(), e.getLocalizedMessage())));
+                    e.printStackTrace();
                     continue;
                 }
 
@@ -152,14 +152,14 @@ public class TravelSystem {
             for (Touch touch : touches) {
                 if (touch.getTouchType() == ON) {
                     if (onTouchMap.containsKey(touch.getPan())) {
-                        unprocessableTouches.add(setupUnprocessableTouch(touch, "On type touch duplication"));
+                        unprocessableTouches.add(setupUnprocessableTouch(touch, "On touch duplication"));
                     } else {
                         onTouchMap.put(touch.getPan(), touch);
                     }
                 }
                 if (touch.getTouchType() == OFF) {
                     if (!onTouchMap.containsKey(touch.getPan())) {
-                        unprocessableTouches.add(setupUnprocessableTouch(touch, "Off type touch without On type"));
+                        unprocessableTouches.add(setupUnprocessableTouch(touch, "Off touch without On type"));
                     } else {
                         Touch onTouch = onTouchMap.remove(touch.getPan());
                         trips.add(calculateTrip(onTouch, touch));
@@ -197,6 +197,11 @@ public class TravelSystem {
         }
         summaries.addAll(summaryMap.values());
     }
+
+    private String[] setupUnprocessableTouch(String[] touch, String reason) {
+        return ArrayUtils.add(touch, reason);
+    }
+
 
     private String[] setupUnprocessableTouch(Touch touch, String reason) {
         return new String[]{
