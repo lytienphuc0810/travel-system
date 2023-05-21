@@ -121,7 +121,6 @@ public class TravelSystem {
                     );
                 } catch (Exception e) {
                     unprocessableTouches.add(setupUnprocessableTouch(nextRecord, String.format("%s %s", e.getClass().getSimpleName(), e.getLocalizedMessage())));
-                    e.printStackTrace();
                     continue;
                 }
 
