@@ -202,7 +202,6 @@ public class TravelSystem {
         return ArrayUtils.add(touch, reason);
     }
 
-
     private String[] setupUnprocessableTouch(Touch touch, String reason) {
         return new String[]{
                 dateTimeFormatter.print(touch.getDatetime()),

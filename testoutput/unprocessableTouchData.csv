@@ -1,0 +1,11 @@
+ID,DateTimeUTC,TouchType,StopID,CompanyID,BusID,HashedPan
+asdasdasd,16-05-2023 12:55:00,OFF,StopB,Company1,Bus9,2255550000666661,NumberFormatException For input string: ""asdasdasd""
+16-05-2023 12:50:00,ON,StopB,Company1,Bus9,ae95c9d5f01369d7cfe1b2ba31a5d9e09db76d4987e5ab96cf4b22fe5a1fae37,On touch duplication
+16-05-2023 12:50:00,ON,StopB,Company1,Bus9,ae95c9d5f01369d7cfe1b2ba31a5d9e09db76d4987e5ab96cf4b22fe5a1fae37,On touch duplication
+16-05-2023 12:50:00,ON,StopB,Company1,Bus9,ae95c9d5f01369d7cfe1b2ba31a5d9e09db76d4987e5ab96cf4b22fe5a1fae37,On touch duplication
+16-05-2023 12:50:00,ON,StopB,Company1,Bus9,ae95c9d5f01369d7cfe1b2ba31a5d9e09db76d4987e5ab96cf4b22fe5a1fae37,On touch duplication
+16-05-2023 12:50:00,ON,StopB,Company1,Bus9,ae95c9d5f01369d7cfe1b2ba31a5d9e09db76d4987e5ab96cf4b22fe5a1fae37,On touch duplication
+16-05-2023 12:50:00,ON,StopB,Company1,Bus10,805093f416a0187eed4e910bc464e869881929eb11160783dff05c5839d2ba27,On touch duplication
+16-05-2023 12:50:00,ON,StopB,Company1,Bus10,805093f416a0187eed4e910bc464e869881929eb11160783dff05c5839d2ba27,On touch duplication
+16-05-2023 12:50:00,ON,StopB,Company1,Bus10,805093f416a0187eed4e910bc464e869881929eb11160783dff05c5839d2ba27,On touch duplication
+16-05-2023 12:50:00,ON,StopB,Company1,Bus10,805093f416a0187eed4e910bc464e869881929eb11160783dff05c5839d2ba27,On touch duplication
